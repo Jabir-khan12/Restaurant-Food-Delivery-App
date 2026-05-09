@@ -1,0 +1,105 @@
+version: '3.9'
+
+services:
+  # ─── Infrastructure ──────────────────────────────────────────────────
+
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: flavour-fleet
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── API Server ──────────────────────────────────────────────────────
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    ports:
+      - '5000:5000'
+    env_file:
+      - ./apps/api/.env
+    environment:
+      NODE_ENV: production
+      MONGO_URI: mongodb://mongo:27017/flavour-fleet
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ─── Background Worker ──────────────────────────────────────────────
+
+  worker:
+    build:
+      context: .
+      dockerfile: apps/worker/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ./apps/worker/.env
+    environment:
+      NODE_ENV: production
+      MONGO_URI: mongodb://mongo:27017/flavour-fleet
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ─── Web App ────────────────────────────────────────────────────────
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        VITE_API_URL: /api/v1
+        VITE_WS_URL: ''
+    restart: unless-stopped
+    ports:
+      - '3000:80'
+    depends_on:
+      - api
+
+  # ─── Admin Panel ────────────────────────────────────────────────────
+
+  admin:
+    build:
+      context: .
+      dockerfile: apps/admin/Dockerfile
+      args:
+        VITE_API_URL: /api/v1
+    restart: unless-stopped
+    ports:
+      - '3001:80'
+    depends_on:
+      - api
+
+volumes:
+  mongo_data:
+  redis_data:
