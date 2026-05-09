@@ -9,15 +9,15 @@ const router = Router();
 router.use(authenticate);
 
 // Customer
-router.post('/', requireRole('customer'), validate(createOrderSchema), controller.createOrder);
-router.get('/my', requireRole('customer'), controller.getMyOrders);
-router.post('/:id/cancel', requireRole('customer'), validate(cancelOrderSchema), controller.cancelOrder);
+router.post('/', requireRole('customer'), validate(createOrderSchema), orderController.createOrder);
+router.get('/my', requireRole('customer'), orderController.getMyOrders);
+router.post('/:id/cancel', requireRole('customer'), validate(cancelOrderSchema), orderController.cancelOrder);
 
 // Restaurant owner / kitchen
 router.get(
   '/restaurant/:restaurantId',
   requireRole('owner', 'kitchen', 'admin'),
-  controller.getRestaurantOrders,
+  orderController.getRestaurantOrders,
 );
 
 // Status update (owner, kitchen, rider, admin)
@@ -25,13 +25,13 @@ router.patch(
   '/:id/status',
   requireRole('owner', 'kitchen', 'rider', 'admin'),
   validate(updateOrderStatusSchema),
-  controller.updateStatus,
+  orderController.updateStatus,
 );
 
 // Shared
-router.get('/:id', controller.getOrderById);
+router.get('/:id', orderController.getOrderById);
 
 // Admin analytics
-router.get('/admin/stats', requireRole('admin'), controller.getStats);
+router.get('/admin/stats', requireRole('admin'), orderController.getStats);
 
 export default router;

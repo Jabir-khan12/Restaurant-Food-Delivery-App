@@ -20,7 +20,11 @@ async function bootstrap() {
   // ─── Connect to Redis ──────────────────────────────────────────────────────
 
   const redis = createRedisClient(env.REDIS_URL);
-  await redis.connect();
+  try {
+    await redis.connect();
+  } catch (redisErr) {
+    logger.warn('⚠️  Redis connection failed. Continuing without Redis (development mode)');
+  }
 
   // ─── Create Express App ─────────────────────────────────────────────────────
 

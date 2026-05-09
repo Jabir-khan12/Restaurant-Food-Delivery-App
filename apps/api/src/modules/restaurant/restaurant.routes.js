@@ -7,18 +7,18 @@ import { createRestaurantSchema, updateRestaurantSchema } from '@flavour-fleet/t
 const router = Router();
 
 // Public
-router.get('/search', controller.search);
-router.get('/slug/:slug', controller.getBySlug);
-router.get('/:id', controller.getById);
+router.get('/search', restaurantController.search);
+router.get('/slug/:slug', restaurantController.getBySlug);
+router.get('/:id', restaurantController.getById);
 
 // Owner routes
 router.use(authenticate);
-router.post('/', requireRole('owner'), validate(createRestaurantSchema), controller.create);
-router.get('/owner/my', requireRole('owner'), controller.getOwnerRestaurants);
-router.patch('/:id', requireRole('owner'), validate(updateRestaurantSchema), controller.update);
-router.patch('/:id/toggle-open', requireRole('owner'), controller.toggleOpen);
+router.post('/', requireRole('owner'), validate(createRestaurantSchema), restaurantController.create);
+router.get('/owner/my', requireRole('owner'), restaurantController.getOwnerRestaurants);
+router.patch('/:id', requireRole('owner'), validate(updateRestaurantSchema), restaurantController.update);
+router.patch('/:id/toggle-open', requireRole('owner'), restaurantController.toggleOpen);
 
 // Admin routes
-router.patch('/:id/status', requireRole('admin'), controller.updateStatus);
+router.patch('/:id/status', requireRole('admin'), restaurantController.updateStatus);
 
 export default router;

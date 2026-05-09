@@ -8,9 +8,9 @@ const router = Router();
 
 router.use(authenticate);
 
-router.get('/', controller.getCart);
-router.post('/items', validate(addToCartSchema), controller.addToCart);
-router.patch('/items/:itemId', validate(updateCartItemSchema), controller.updateCartItem);
-router.delete('/', controller.clearCart);
+router.get('/', cartController.getCart);
+router.post('/items', validate(addToCartSchema), cartController.addToCart);
+router.patch('/items/:itemId', validate(updateCartItemSchema), cartController.updateCartItem);
+router.delete('/', cartController.clearCart);
 
 export default router;

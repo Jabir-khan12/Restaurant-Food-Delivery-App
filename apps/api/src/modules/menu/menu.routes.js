@@ -7,42 +7,42 @@ import { menuCategorySchema, menuItemSchema, updateMenuItemSchema } from '@flavo
 const router = Router();
 
 // Public
-router.get('/:restaurantId/categories', controller.getCategories);
-router.get('/:restaurantId/items', controller.getItems);
-router.get('/:restaurantId/items/search', controller.searchItems);
-router.get('/items/:itemId', controller.getItemById);
+router.get('/:restaurantId/categories', menuController.getCategories);
+router.get('/:restaurantId/items', menuController.getItems);
+router.get('/:restaurantId/items/search', menuController.searchItems);
+router.get('/items/:itemId', menuController.getItemById);
 
 // Owner router.use(authenticate);
 router.post(
   '/:restaurantId/categories',
   requireRole('owner'),
   validate(menuCategorySchema),
-  controller.createCategory,
+  menuController.createCategory,
 );
 router.patch(
   '/categories/:categoryId',
   requireRole('owner'),
   validate(menuCategorySchema),
-  controller.updateCategory,
+  menuController.updateCategory,
 );
-router.delete('/categories/:categoryId', requireRole('owner'), controller.deleteCategory);
+router.delete('/categories/:categoryId', requireRole('owner'), menuController.deleteCategory);
 
 router.post(
   '/:restaurantId/items',
   requireRole('owner'),
   validate(menuItemSchema),
-  controller.createItem,
+  menuController.createItem,
 );
 router.patch(
   '/items/:itemId',
   requireRole('owner'),
   validate(updateMenuItemSchema),
-  controller.updateItem,
+  menuController.updateItem,
 );
 router.patch(
   '/items/:itemId/toggle-availability',
   requireRole('owner'),
-  controller.toggleAvailability,
+  menuController.toggleAvailability,
 );
 
 export default router;

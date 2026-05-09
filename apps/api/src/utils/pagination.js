@@ -1,6 +1,6 @@
 
 
-export function buildPaginationMeta({ page, limit, total }: PaginationParams) {
+export function buildPaginationMeta({ page, limit, total }) {
   const totalPages = Math.ceil(total / limit);
   return {
     page,
